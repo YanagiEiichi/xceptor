@@ -12,7 +12,12 @@ XCeptor.when('GET', '/', function(req, res) {
 XCeptor.get('/', function(req, res) {
   console.log(2, res.responseText);
   res.responseText++;
-  return false;
+  // 'thenable' can be supported
+  return {then:function(f){
+    setTimeout(function(){
+      f(false);
+    },1000)
+  }};
 }, function(req, res) {
   console.log(4, res.responseText);
   res.responseText += '';

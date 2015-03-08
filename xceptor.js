@@ -19,15 +19,27 @@ var XCeptor = function() {
   var Handlers = function() {};
   Handlers.prototype = [];
   Handlers.prototype.solve = function(args, resolve, reject) {
-    var result;
-    for(var i = 0; i < this.length; i++) {
-      result = this[i].apply(null, args);
-      switch(result) {
-        case true: return resolve && resolve();
-        case false: return reject && reject();
+    var that = this;
+    var iterator = function(i) {
+      var select = function(result) {
+        switch(result) {
+          case true: return resolve && resolve();
+          case false: return reject && reject();
+          default:
+            if(result && typeof result.then === 'function') {
+              result.then(select, function(e) { throw e; });
+            } else {
+              iterator(i + 1);
+            }
+        }
+      };
+      if(i < that.length) {
+        select(that[i].apply(null, args));
+      } else {
+        resolve && resolve();
       }
-    }
-    resolve && resolve();
+    };
+    iterator(0);
   };
 
   // Create two handlers objects
