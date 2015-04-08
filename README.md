@@ -5,10 +5,9 @@
 
 <img src="logic.png" width="538" />
 
-## API
+## Usage
 
-
-```
+```javascript
 XCeptor.when(method, route, requestHandler, responseHandler);
 
 XCeptor[method](route, requestHandler, responseHandler);
@@ -17,3 +16,9 @@ XCeptor[method](route, requestHandler, responseHandler);
 ## Live Demo
 
 [demo.html](http://yanagieiichi.github.io/xceptor/demo.html)
+
+## Install
+
+```bash
+bower install xceptor
+```

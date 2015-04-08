@@ -1,0 +1,18 @@
+{
+  "name": "xceptor",
+  "main": "xceptor.js",
+  "version": "0.1.0",
+  "homepage": "https://github.com/YanagiEiichi/xceptor",
+  "authors": [
+    "YanagiEiichi <admin@web-tinker.com>"
+  ],
+  "description": "An XHR interceptor",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
