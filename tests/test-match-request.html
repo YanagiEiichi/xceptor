@@ -1,0 +1,35 @@
+<html ng-app="test">
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/tester/tester.js"></script>
+<script src="../xceptor.js"></script>
+<script>
+var answer;
+
+XCeptor.when('GET', /^\/fuck/, function(req, res) {
+  answer = [];
+  res.headers = [
+    { header: 'Content-Type', value: 'application/json' }
+  ];
+  res.responseText = JSON.stringify(answer);
+  req.url = '/xxxx';
+});
+
+XCeptor.when('GET', /^\/xxxx/, function(req, res) {
+  answer.push(1);
+  res.responseText = JSON.stringify(answer);
+  return false;
+});
+
+XCeptor.when('GET', /^\/fuck/, function(req, res) {
+  answer.push(2);
+  res.responseText = JSON.stringify(answer);
+  return false;
+});
+
+$.ajax({ method: 'get', url: '/fuck' }).then(function(data) {
+  Tester.assert(JSON.stringify(data) === '[1]', 'response data must be [1]');
+  Tester.feedback(true);
+}, function() {
+  Tester.feedback(false);
+});
+</script>

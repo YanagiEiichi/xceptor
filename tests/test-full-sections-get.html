@@ -1,0 +1,40 @@
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/tester/tester.js"></script>
+<script src="../xceptor.js"></script>
+<script>
+var answer;
+
+XCeptor.get(/^\/api/, function(req, res) {
+  answer = [1];
+}, function(req, res) {
+  answer.push(4);
+});
+
+XCeptor.get(/^\/api/, function(req, res) {
+  answer.push(2);
+}, function(req, res) {
+  answer.push(5);
+});
+
+XCeptor.get(/^\/api/, function(req, res) {
+  answer.push(3);
+  // Do not launch
+  return false;
+}, function(req, res) {
+  answer.push(6);
+  // Set status to 200
+  res.status = 200;
+  res.statusText = 'OK';
+  res.headers = [
+    { header: 'Content-Type', value: 'application/json' }
+  ];
+  res.responseText = JSON.stringify(answer);
+});
+
+$.get('/api').then(function(data, state, response) {
+  Tester.assert(data.join('') === '123456', 'the result must be 123456');
+  Tester.feedback(true);
+}).then(null, function(e) {
+  Tester.feedback(false);
+});
+</script>

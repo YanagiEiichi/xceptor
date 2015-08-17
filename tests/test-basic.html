@@ -1,0 +1,33 @@
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/tester/tester.js"></script>
+<script src="../xceptor.js"></script>
+<script>
+XCeptor.get(/^\/api/, function(req, res) {
+  res.responseText = 'Hello';
+});
+
+XCeptor.get(/^\/api/, function(req, res) {
+  // Set a 200 response
+  res.status = 200;
+  res.statusText = 'OK';
+  // Set data
+  res.responseText += ' World';
+  // Do not launch
+  return false;
+});
+
+$.when(
+  $.get('/api').then(function(text, state, response) {
+    Tester.assert(response.status === 200);
+    Tester.assert(response.responseText === 'Hello World');
+  }),
+  $.get('/api').then(function(text, state, response) {
+    Tester.assert(response.status === 200);
+    Tester.assert(response.responseText === 'Hello World');
+  })
+).then(function() {
+  Tester.feedback(true);
+}, function() {
+  Tester.feedback(false);
+});
+</script>
