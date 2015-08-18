@@ -1,4 +1,5 @@
 var XCeptor = function() {
+  if(XMLHttpRequest.XCeptor) return XMLHttpRequest.XCeptor;
 
   var RESPONSEX = [
     'response',
@@ -176,7 +177,7 @@ var XCeptor = function() {
   }(XMLHttpRequest);
 
   // Define interface methods
-  return new function() {
+  return XMLHttpRequest.XCeptor = new function() {
     var that = this;
     this.when = function(method, route, requestHandler, responseHandler) {
       var isMatched = function(request) {
