@@ -1,11 +1,3 @@
-/************************************************
-  PROJECT: XCeptor
-  LATEST: 2015-03-02
-  LICENCE: MIT
-  AUTHOR: yanagieiichi@web-tinker.com
-  GIT: git@github.com:YanagiEiichi/xceptor
-************************************************/
-
 var XCeptor = function() {
 
   var RESPONSEX = [
@@ -72,7 +64,6 @@ var XCeptor = function() {
         response: interface.response, 
         headers: []
       };
-      var parameters = [ request, response ];
       var Event = function(type) {
         this.type = type;
         this.target = interface;
@@ -212,5 +203,5 @@ var XCeptor = function() {
       }(methods[i]);
     }();
   };
-}();
 
+}();
