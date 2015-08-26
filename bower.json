@@ -1,7 +1,7 @@
 {
   "name": "xceptor",
   "main": "xceptor.js",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "homepage": "https://github.com/YanagiEiichi/xceptor",
   "authors": [
     "YanagiEiichi <admin@web-tinker.com>"
@@ -12,7 +12,8 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "test",
+    "logic.png",
+    "README.md",
     "tests"
   ]
 }
