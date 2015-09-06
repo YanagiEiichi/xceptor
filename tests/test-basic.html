@@ -17,6 +17,7 @@ XCeptor.get(/^\/api/, function(req, res) {
 });
 
 $.when(
+  $.get('?'),
   $.get('/api').then(function(text, state, response) {
     Tester.assert(response.status === 200);
     Tester.assert(response.responseText === 'Hello World');

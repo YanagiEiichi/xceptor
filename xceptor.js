@@ -164,9 +164,9 @@ var XCeptor = function() {
           }
           triggerInterfaceEvent('readystatechange');
         };
-        var events = [ 'onerror', 'onload', 'ontimeout' ];
+        var events = [ 'error', 'load', 'timeout' ];
         var buildEvent = function(name) {
-          xhr[name] = function() {
+          xhr['on' + name] = function() {
             interface.readyState = xhr.readyState;
             triggerInterfaceEvent(name);
           };
