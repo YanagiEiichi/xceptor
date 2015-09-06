@@ -25,7 +25,7 @@ $.when(
     Tester.assert(method === 'PATCH', 'method must be PATCH');
   }),
   $.ajax({ method: 'head', url: '/api' }).then(function(response) {
-    console.log(response === void 0, 'response must be undefined');
+    Tester.assert(response === void 0, 'response must be undefined');
   })
 ).then(function() {
   Tester.feedback(true);
