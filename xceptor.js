@@ -44,7 +44,12 @@ var XCeptor = function() {
     XMLHttpRequest = function() {
       var xhr = new XHR;
       var interface = this;
-      for(var i in xhr) if(typeof xhr[i] !== 'function') interface[i] = xhr[i];
+      for(var i in xhr) {
+        try {
+          // Accessing may be throw on Android 4.3
+          if(typeof xhr[i] !== 'function') interface[i] = xhr[i];
+        } catch(error) {}
+      }
       var request = {
         method: null,
         url: null,
