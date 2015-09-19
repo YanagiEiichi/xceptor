@@ -84,6 +84,38 @@ var Event = function(type, target) {
   this.target = target;
 };
 
+// SimpleEventModel internal decorator
+var SimpleEventDecorator = function(Constructor) {
+  var token = '__events__';
+  var heap = function(object, name) {
+    var events = token in object ? object[token] : object[token] = {};
+    return name in events ? events[name] : events[name] = [];
+  }
+  var addEventListener = function(name, handler) {
+    heap(this, name).push(handler);
+  };
+  var removeEventListener = function(name, handler) {
+    var list = heap(this, name);
+    for(var i = 0; i < list.length; i++) {
+      if(list[i] === handler) list.splice(i, 1), i = 0 / 0;
+    }
+  };
+  var dispatchEvent = function(event) {
+    var list = heap(this, event.type);
+    for(var i = 0; i < list.length; i++) list[i](event);
+    var key = 'on' + event.type;
+    if(typeof this[key] === 'function') this[key](event);
+  };
+  var SimpleEventModel = function() {
+    Constructor.apply(this, arguments);
+    this.addEventListener = addEventListener;
+    this.removeEventListener = removeEventListener;
+    this.dispatchEvent = dispatchEvent;
+  };
+  SimpleEventModel.prototype = Constructor.prototype;
+  return SimpleEventModel;
+};
+
 
 /* Main Process */
 
@@ -173,8 +205,7 @@ XMLHttpRequest = function() {
     xhr.abort();
   };
   var trigger = function(name) {
-    var event = new Event(name, xceptor);
-    if(typeof xceptor['on' + name] === 'function') xceptor['on' + name](event);
+    xceptor.dispatchEvent(new Event(name, xceptor));
   };
   var updateResponseHeaders = function() {
     response.headers.splice(0, response.headers.length);
@@ -216,6 +247,8 @@ XMLHttpRequest = function() {
     for(var i = 0; i < events.length; i++) buildEvent(events[i]);
   }();
 };
+
+XMLHttpRequest = SimpleEventDecorator(XMLHttpRequest);
 
 // Define xceptor methods
 var XCeptor = XMLHttpRequest.XCeptor = new function() {

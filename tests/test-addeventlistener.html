@@ -1,0 +1,63 @@
+<script src="bower_components/tester/tester.js"></script>
+<script src="../xceptor.js"></script>
+<script>
+XCeptor.get('/', function(req, res) {
+  res.responseText = 'Hello';
+  return false;
+});
+
+var expection = new Tester.Expection(
+  'send',
+  'readystatechange to 4',
+  'load event 1',
+  'load event 2',
+  'onload',
+  'done'
+);
+
+expection.then(function() {
+  Tester.feedback(true);
+}, function() {
+  Tester.feedback(false);
+});
+
+setTimeout(function() {
+  expection.answer('done');
+}, 200);
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', '/');
+
+xhr.send();
+
+Tester.log('after send');
+expection.answer('send');
+
+xhr.addEventListener('load', function() {
+  Tester.log('load event 1');
+  expection.answer('load event 1');
+});
+
+xhr.addEventListener('load', function() {
+  Tester.log('load event 2');
+  expection.answer('load event 2');
+});
+
+var handler3 = function() {
+  Tester.log('load event 3');
+  expection.answer('load event 3');
+};
+xhr.addEventListener('load', handler3);
+xhr.removeEventListener('load', handler3);
+
+xhr.onload = function() {
+  Tester.log('onload');
+  expection.answer('onload');
+};
+
+xhr.addEventListener('readystatechange', function() {
+  if(xhr.readyState < 4) return;
+  Tester.log('readystatechange to 4');
+  expection.answer('readystatechange to 4');
+});
+</script>

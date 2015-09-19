@@ -1,11 +1,12 @@
 <html ng-app="test">
-<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/jquery1/dist/jquery.js"></script>
 <script src="bower_components/tester/tester.js"></script>
 <script src="../xceptor.js"></script>
 <script>
 var answer;
 
 XCeptor.when('GET', /^\/fuck/, function(req, res) {
+  Tester.log(0);
   answer = [];
   res.headers = [
     { header: 'Content-Type', value: 'application/json' }
@@ -15,12 +16,15 @@ XCeptor.when('GET', /^\/fuck/, function(req, res) {
 });
 
 XCeptor.when('GET', /^\/xxxx/, function(req, res) {
+  Tester.log(1);
   answer.push(1);
+  res.status = 200;
   res.responseText = JSON.stringify(answer);
   return false;
 });
 
 XCeptor.when('GET', /^\/fuck/, function(req, res) {
+  Tester.log(2);
   answer.push(2);
   res.responseText = JSON.stringify(answer);
   return false;

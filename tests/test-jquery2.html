@@ -1,5 +1,12 @@
-<script src="bower_components/jquery1/dist/jquery.js"></script>
 <script src="bower_components/tester/tester.js"></script>
+<script>
+if(!-[1,]) {
+  Tester.log('IE 8 ignore');
+  Tester.feedback(true);
+  document.write('<!--');
+}
+</script>
+<script src="bower_components/jquery2/dist/jquery.js"></script>
 <script src="../xceptor.js"></script>
 <script>
 XCeptor.get(/^\/api/, function(req, res) {
