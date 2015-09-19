@@ -287,13 +287,13 @@ var XCeptor = XMLHttpRequest.XCeptor = new function() {
 
 // UMD
 switch(true) {
-  // AMD
-  case typeof define === 'function' && !!define.amd:
-    define('XCeptor', function() { return XCeptor; });
-    break;
   // CommonJS
   case typeof module === 'object' && !!module.exports:
     module.exports = XCeptor;
+    break;
+  // AMD (Add a 'String' wrapper here to fuck webpack)
+  case String(typeof define) === 'function' && !!define.amd:
+    define('XCeptor', function() { return XCeptor; });
     break;
   // Global
   default:

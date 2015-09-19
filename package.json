@@ -1,7 +1,7 @@
 {
   "name": "xceptor",
-  "version": "0.1.5",
-  "description": "a xmlhttp interceptor",
+  "version": "0.2.1",
+  "description": "XMLHttpRequest Interceptor",
   "main": "xceptor.js",
   "directories": {
     "test": "tests"

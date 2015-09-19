@@ -1,12 +1,12 @@
 {
   "name": "xceptor",
   "main": "xceptor.js",
-  "version": "0.1.5",
+  "version": "0.2.1",
   "homepage": "https://github.com/YanagiEiichi/xceptor",
   "authors": [
     "YanagiEiichi <admin@web-tinker.com>"
   ],
-  "description": "An XHR interceptor",
+  "description": "XMLHttpRequest Interceptor",
   "license": "MIT",
   "ignore": [
     "**/.*",
