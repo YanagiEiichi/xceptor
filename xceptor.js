@@ -6,6 +6,9 @@
 // Avoid duplicate runing
 if(XMLHttpRequest.XCeptor) return;
 
+// Save original XMLHttpRequest class
+var OriginalXMLHttpRequest = XMLHttpRequest;
+
 // Handlers internal class
 var Handlers = function() {};
 // To use equivalence Checking
@@ -49,15 +52,9 @@ Handlers.prototype.add = function(handler, method, route) {
   });
 };
 
-
-/* Main Process */
-
 // Create two handlers objects
 var requestHandlers = new Handlers();
 var responseHandlers = new Handlers();
-
-// Save original XMLHttpRequest class
-var OriginalXMLHttpRequest = XMLHttpRequest;
 
 // To sync object keys with xhr
 var updateKeys;
@@ -81,6 +78,15 @@ void function() {
   };
 }();
 
+// Event internal class
+var Event = function(type, target) {
+  this.type = type;
+  this.target = target;
+};
+
+
+/* Main Process */
+
 // Create interceptor
 XMLHttpRequest = function() {
   var xhr = new OriginalXMLHttpRequest();
@@ -101,10 +107,6 @@ XMLHttpRequest = function() {
     status: xceptor.status,
     statusText: xceptor.statusText,
     headers: []
-  };
-  var Event = function(type) {
-    this.type = type;
-    this.target = xceptor;
   };
   // Methods mapping
   xceptor.open = function(method, url, async, username, password) {
@@ -162,16 +164,17 @@ XMLHttpRequest = function() {
       setTimeout(function() {
         response.readyState = 4;
         complete();
-        triggerInterfaceEvent('readystatechange');
-        triggerInterfaceEvent('load');
+        trigger('readystatechange');
+        trigger('load');
       });
     });
   };
   xceptor.abort = function() {
     xhr.abort();
   };
-  var triggerInterfaceEvent = function(event) {
-    if(typeof xceptor['on' + event] === 'function') xceptor['on' + event](new Event(event));
+  var trigger = function(name) {
+    var event = new Event(name, xceptor);
+    if(typeof xceptor['on' + name] === 'function') xceptor['on' + name](event);
   };
   var updateResponseHeaders = function() {
     response.headers.splice(0);
@@ -199,15 +202,15 @@ XMLHttpRequest = function() {
       if(xhr.readyState === 4) {
         updateKeys(xhr, response, /^response/);
         complete();
-        setTimeout(function() { triggerInterfaceEvent('load'); });
+        setTimeout(function() { trigger('load'); });
       }
-      triggerInterfaceEvent('readystatechange');
+      trigger('readystatechange');
     };
     var events = [ 'error', 'timeout' ];
     var buildEvent = function(name) {
       xhr['on' + name] = function() {
         xceptor.readyState = xhr.readyState;
-        triggerInterfaceEvent(name);
+        trigger(name);
       };
     };
     for(var i = 0; i < events.length; i++) buildEvent(events[i]);
