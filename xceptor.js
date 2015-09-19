@@ -201,10 +201,11 @@ XMLHttpRequest = function() {
       if(xhr.readyState === 4) {
         updateResponse();
         complete();
+        setTimeout(function() { triggerInterfaceEvent('load'); });
       }
       triggerInterfaceEvent('readystatechange');
     };
-    var events = [ 'error', 'load', 'timeout' ];
+    var events = [ 'error', 'timeout' ];
     var buildEvent = function(name) {
       xhr['on' + name] = function() {
         xceptor.readyState = xhr.readyState;
