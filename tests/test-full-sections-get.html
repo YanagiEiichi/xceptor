@@ -5,22 +5,28 @@
 var answer;
 
 XCeptor.get(/^\/api/, function(req, res) {
+  Tester.log(1);
   answer = [1];
 }, function(req, res) {
+  Tester.log(4);
   answer.push(4);
 });
 
 XCeptor.get(/^\/api/, function(req, res) {
+  Tester.log(2);
   answer.push(2);
 }, function(req, res) {
+  Tester.log(5);
   answer.push(5);
 });
 
 XCeptor.get(/^\/api/, function(req, res) {
+  Tester.log(3);
   answer.push(3);
   // Do not launch
   return false;
 }, function(req, res) {
+  Tester.log(6);
   answer.push(6);
   // Set status to 200
   res.status = 200;

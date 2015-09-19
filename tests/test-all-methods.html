@@ -8,26 +8,41 @@ XCeptor.when(/^/, /^\/api/, function(req, res) {
   return false;
 });
 
-$.when(
+var requests = [
   $.ajax({ method: 'get', url: '/api' }).then(function(method) {
+    Tester.log(method);
     Tester.assert(method === 'GET', 'method must be GET');
   }),
   $.ajax({ method: 'post', url: '/api' }).then(function(method) {
+    Tester.log(method);
     Tester.assert(method === 'POST', 'method must be POST');
   }),
   $.ajax({ method: 'delete', url: '/api' }).then(function(method) {
+    Tester.log(method);
     Tester.assert(method === 'DELETE', 'method must be DELETE');
   }),
   $.ajax({ method: 'put', url: '/api' }).then(function(method) {
+    Tester.log(method);
     Tester.assert(method === 'PUT', 'method must be PUT');
   }),
-  $.ajax({ method: 'patch', url: '/api' }).then(function(method) {
-    Tester.assert(method === 'PATCH', 'method must be PATCH');
-  }),
   $.ajax({ method: 'head', url: '/api' }).then(function(response) {
+    Tester.log('head');
     Tester.assert(response === void 0, 'response must be undefined');
   })
-).then(function() {
+];
+
+if(!-[1,]) {
+  Tester.log('IE 8 ignore');
+} else {
+  requests.push(
+    $.ajax({ method: 'patch', url: '/api' }).then(function(method) {
+      Tester.log(method);
+      Tester.assert(method === 'PATCH', 'method must be PATCH');
+    })
+  );
+}
+
+$.when.apply($, requests).then(function() {
   Tester.feedback(true);
 }, function() {
   Tester.feedback(false);

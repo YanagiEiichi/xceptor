@@ -4,6 +4,7 @@
 <script>
 XCeptor.get(/^\/api/, function(req, res) {
   res.responseText = 'Hello';
+  Tester.log(res.responseText);
 });
 
 XCeptor.get(/^\/api/, function(req, res) {
@@ -12,19 +13,24 @@ XCeptor.get(/^\/api/, function(req, res) {
   res.statusText = 'OK';
   // Set data
   res.responseText += ' World';
+  Tester.log(res.responseText);
   // Do not launch
   return false;
 });
 
 $.when(
-  $.get('?'),
-  $.get('/api').then(function(text, state, response) {
-    Tester.assert(response.status === 200);
-    Tester.assert(response.responseText === 'Hello World');
+  $.get('?').then(function() {
+    Tester.log('?');
   }),
   $.get('/api').then(function(text, state, response) {
-    Tester.assert(response.status === 200);
-    Tester.assert(response.responseText === 'Hello World');
+    Tester.log('/api 1');
+    Tester.assert(response.status === 200, 'status must be 200');
+    Tester.assert(response.responseText === 'Hello World', 'responseText error');
+  }),
+  $.get('/api').then(function(text, state, response) {
+    Tester.log('/api 2');
+    Tester.assert(response.status === 200, 'status must be 200');
+    Tester.assert(response.responseText === 'Hello World', 'responseText error');
   })
 ).then(function() {
   Tester.feedback(true);

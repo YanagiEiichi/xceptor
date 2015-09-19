@@ -59,20 +59,26 @@ var responseHandlers = new Handlers();
 // To sync object keys with xhr
 var updateKeys;
 void function() {
-  var keys = [];
-  var xhr = new OriginalXMLHttpRequest();
-  for(var key in xhr) {
-    /**/ try { /* Fuck Android 4.3- */
-    /**/   void xhr[key];
-    /**/ } catch(error) {
-    /**/   continue;
-    /**/ }
-    if(typeof xhr[key] === 'function') continue;
-    keys.push(key);
-  }
+  var keys = [
+    'readyState',
+    'timeout',
+    'withCredentials',
+    'status',
+    'statusText',
+    'responseURL',
+    'responseType',
+    'response',
+    'responseText',
+    'responseXML'
+  ];
   updateKeys = function(from, to, filter) {
     for(var i = 0, key; key = keys[i]; i++) {
       if(filter && !filter.test(key)) continue;
+      /**/ try { /* Fuck Android 4.3- and IE */
+      /**/   void to[key], void from[key];
+      /**/ } catch(error) {
+      /**/   continue;
+      /**/ }
       to[key] = from[key];
     }
   };
@@ -194,7 +200,11 @@ XMLHttpRequest = function() {
     }, function() {
       // Fake actions
       setTimeout(function() {
+        response.readyState = 3;
+        updateKeys(response, xceptor);
+        trigger('readystatechange');
         response.readyState = 4;
+        updateKeys(response, xceptor);
         complete();
         trigger('readystatechange');
         trigger('load');
@@ -211,14 +221,15 @@ XMLHttpRequest = function() {
     response.headers.splice(0, response.headers.length);
     response.status = xhr.status;
     response.statusText = xhr.statusText;
-    xhr.getAllResponseHeaders().replace(/.+/g,function(e) {
-      e = e.match(/(^.*?): (.*$)/);
-      response.headers.push({ header: e[1], value: e[2] });
+    xhr.getAllResponseHeaders().replace(/.+/g, function($0) {
+      var result = $0.match(/(^.*?): (.*$)/);
+      if(!result) return;
+      response.headers.push({ header: result[1], value: result[2] });
     });
   };
   var complete = function() {
     responseHandlers.solve([request, response], function() {
-      for(var i in response) if(i in xceptor) xceptor[i] = response[i];
+      updateKeys(response, xceptor);
     });
   };
   // Mapping response
@@ -226,12 +237,10 @@ XMLHttpRequest = function() {
   // Mapping events
   void function() {
     xhr.onreadystatechange = function() {
-      // Read from 'xhr'
-      var i, property;
-      xceptor.readyState = xhr.readyState;
+      updateKeys(xhr, xceptor);
+      updateKeys(xhr, response);
       if(xhr.readyState === 3) updateResponseHeaders();
       if(xhr.readyState === 4) {
-        updateKeys(xhr, response, /^response/);
         complete();
         setTimeout(function() { trigger('load'); });
       }
@@ -246,6 +255,14 @@ XMLHttpRequest = function() {
     };
     for(var i = 0; i < events.length; i++) buildEvent(events[i]);
   }();
+};
+
+XMLHttpRequest.prototype = {
+  DONE: 4,
+  HEADERS_RECEIVED: 2,
+  LOADING: 3,
+  OPENED: 1,
+  UNSENT: 0
 };
 
 XMLHttpRequest = SimpleEventDecorator(XMLHttpRequest);
