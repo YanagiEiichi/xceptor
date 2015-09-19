@@ -9,7 +9,7 @@
     "**/.*"
   ],
   "dependencies": {
-    "tester": "~0.0.6",
+    "tester": "~0.0.12",
     "angular": "~1.2",
     "jquery1": "git@github.com:jquery/jquery#~1.11.3",
     "jquery2": "git@github.com:jquery/jquery#~2.1.4"
