@@ -43,11 +43,11 @@ var XCeptor = function() {
   void function(XHR) {
     XMLHttpRequest = function() {
       var xhr = new XHR;
-      var interface = this;
+      var xceptor = this;
       for(var i in xhr) {
         try {
           // Accessing may be throw on Android 4.3
-          if(typeof xhr[i] !== 'function') interface[i] = xhr[i];
+          if(typeof xhr[i] !== 'function') xceptor[i] = xhr[i];
         } catch(error) {}
       }
       var request = {
@@ -58,24 +58,24 @@ var XCeptor = function() {
         password: void 0,
         headers: [],
         overridedMimeType: void 0,
-        timeout: interface.timeout,
-        withCredentials: interface.withCredentials
+        timeout: xceptor.timeout,
+        withCredentials: xceptor.withCredentials
       };
       var response = {
-        status: interface.status,
-        statusText: interface.statusText,
-        responseType: interface.responseType,
-        responseText: interface.responseText,
-        responseXML: interface.responseXML,
-        response: interface.response, 
+        status: xceptor.status,
+        statusText: xceptor.statusText,
+        responseType: xceptor.responseType,
+        responseText: xceptor.responseText,
+        responseXML: xceptor.responseXML,
+        response: xceptor.response, 
         headers: []
       };
       var Event = function(type) {
         this.type = type;
-        this.target = interface;
+        this.target = xceptor;
       };
       // Methods mapping
-      interface.open = function(method, url, async, username, password) {
+      xceptor.open = function(method, url, async, username, password) {
         // Save to 'request'
         request.method = (method + '').toUpperCase();
         request.url = url + '';
@@ -83,15 +83,15 @@ var XCeptor = function() {
         if(username !== void 0) request.username = username + '';
         if(password !== void 0) request.password = password + '';
       };
-      interface.setRequestHeader = function(header, value) {
+      xceptor.setRequestHeader = function(header, value) {
         // Save to 'headers'
         request.headers.push({ header: header + '', value: value + '' }); 
       };
-      interface.overrideMimeType = function(mimetype) {
+      xceptor.overrideMimeType = function(mimetype) {
         // Save to 'request'
         request.overridedMimeType = mimetype;
       };
-      interface.getResponseHeader = function(header) {
+      xceptor.getResponseHeader = function(header) {
         // Read from 'response'
         var headers = response.headers;
         header = header + '';
@@ -100,7 +100,7 @@ var XCeptor = function() {
         }
         return null;
       };
-      interface.getAllResponseHeaders = function() {
+      xceptor.getAllResponseHeaders = function() {
         // Read from 'response'
         var headers = response.headers;
         var allHeaders = [];
@@ -109,11 +109,11 @@ var XCeptor = function() {
         }
         return allHeaders.join('\r\n');
       };
-      interface.send = function(data) {
+      xceptor.send = function(data) {
         // Copy setter properties to 'request'
         request.data = data;
-        request.withCredentials = interface.withCredentials;
-        request.timeout = interface.timeout;
+        request.withCredentials = xceptor.withCredentials;
+        request.timeout = xceptor.timeout;
         // Invoke interceptor
         requestHandlers.solve([request, response], function() {
           // Actual actions 
@@ -135,11 +135,11 @@ var XCeptor = function() {
           });
         });
       };
-      interface.abort = function() {
+      xceptor.abort = function() {
         xhr.abort();        
       };
       var triggerInterfaceEvent = function(event) {
-        if(typeof interface['on' + event] === 'function') interface['on' + event](new Event(event));
+        if(typeof xceptor['on' + event] === 'function') xceptor['on' + event](new Event(event));
       };
       var updateResponseHeaders = function() {
         response.headers.splice(0);
@@ -152,7 +152,7 @@ var XCeptor = function() {
       };
       var complete = function() {
         responseHandlers.solve([request, response], function() {
-          for(var i in response) if(i in interface) interface[i] = response[i];
+          for(var i in response) if(i in xceptor) xceptor[i] = response[i];
         });
       };
       // Events mapping
@@ -160,7 +160,7 @@ var XCeptor = function() {
         xhr.onreadystatechange = function() {
           // Read from 'xhr'
           var i, property;
-          interface.readyState = xhr.readyState;
+          xceptor.readyState = xhr.readyState;
           if(xhr.readyState === 3) updateResponseHeaders();
           if(xhr.readyState === 4) {
             // Read from 'xhr'
@@ -172,7 +172,7 @@ var XCeptor = function() {
         var events = [ 'error', 'load', 'timeout' ];
         var buildEvent = function(name) {
           xhr['on' + name] = function() {
-            interface.readyState = xhr.readyState;
+            xceptor.readyState = xhr.readyState;
             triggerInterfaceEvent(name);
           };
         };
@@ -181,7 +181,7 @@ var XCeptor = function() {
     };
   }(XMLHttpRequest);
 
-  // Define interface methods
+  // Define xceptor methods
   return XMLHttpRequest.XCeptor = new function() {
     var that = this;
     this.when = function(method, route, requestHandler, responseHandler) {
