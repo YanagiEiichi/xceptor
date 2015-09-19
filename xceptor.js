@@ -59,10 +59,10 @@ var responseHandlers = new Handlers();
 // Save original XMLHttpRequest class
 var OriginalXMLHttpRequest = XMLHttpRequest;
 
-// Get and cache properties of original XMLHttpRequest
-var originalKeys = [];
-var responsiveKeys = [];
+// To sync object keys with xhr
+var updateKeys;
 void function() {
+  var keys = [];
   var xhr = new OriginalXMLHttpRequest();
   for(var key in xhr) {
     /**/ try { /* Fuck Android 4.3- */
@@ -71,18 +71,21 @@ void function() {
     /**/   continue;
     /**/ }
     if(typeof xhr[key] === 'function') continue;
-    originalKeys.push(key);
-    if(/^response/.test(key)) responsiveKeys.push(key);
+    keys.push(key);
   }
+  updateKeys = function(from, to, filter) {
+    for(var i = 0, key; key = keys[i]; i++) {
+      if(filter && !filter.test(key)) continue;
+      to[key] = from[key];
+    }
+  };
 }();
 
 // Create interceptor
 XMLHttpRequest = function() {
   var xhr = new OriginalXMLHttpRequest();
   var xceptor = this;
-  for(var i = 0; i < originalKeys.length; i++) {
-    xceptor[originalKeys[i]] = xhr[originalKeys[i]];
-  }
+  updateKeys(xhr, xceptor);
   var request = {
     method: null,
     url: null,
@@ -170,11 +173,6 @@ XMLHttpRequest = function() {
   var triggerInterfaceEvent = function(event) {
     if(typeof xceptor['on' + event] === 'function') xceptor['on' + event](new Event(event));
   };
-  var updateResponse = function() {
-    for(var i = 0; i < responsiveKeys.length; i++) {
-      response[responsiveKeys[i]] = xhr[responsiveKeys[i]];
-    }
-  };
   var updateResponseHeaders = function() {
     response.headers.splice(0);
     response.status = xhr.status;
@@ -190,7 +188,7 @@ XMLHttpRequest = function() {
     });
   };
   // Mapping response
-  updateResponse();
+  updateKeys(xhr, response, /^response/);
   // Mapping events
   void function() {
     xhr.onreadystatechange = function() {
@@ -199,7 +197,7 @@ XMLHttpRequest = function() {
       xceptor.readyState = xhr.readyState;
       if(xhr.readyState === 3) updateResponseHeaders();
       if(xhr.readyState === 4) {
-        updateResponse();
+        updateKeys(xhr, response, /^response/);
         complete();
         setTimeout(function() { triggerInterfaceEvent('load'); });
       }
