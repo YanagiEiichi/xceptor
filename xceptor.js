@@ -5,6 +5,14 @@ if(XMLHttpRequest.XCeptor) return;
 
 // Handlers internal class
 var Handlers = function() {};
+// To use equivalence Checking
+Handlers.check = function(what, value) {
+  // Note, use a '==' here, match 'null' or 'undefined' 
+  if(what == null || what === value) return true;
+  // Check 'test' method, match RegExp or RegExp-like
+  if(typeof what.test === 'function') return what.test(value);
+  if(typeof what === 'function') return what(value);
+}
 Handlers.prototype = [];
 Handlers.prototype.solve = function(args, resolve, reject) {
   var that = this;
@@ -29,6 +37,15 @@ Handlers.prototype.solve = function(args, resolve, reject) {
   };
   iterator(0);
 };
+Handlers.prototype.add = function(handler, method, route) {
+  if(typeof handler !== 'function') return;
+  this.push(function(request, response) {
+    if(Handlers.check(method, request.method) && Handlers.check(route, request.url)) {
+      return handler(request, response);
+    }
+  });
+};
+
 
 // Create two handlers objects
 var requestHandlers = new Handlers();
@@ -197,26 +214,15 @@ XMLHttpRequest = function() {
 var XCeptor = XMLHttpRequest.XCeptor = new function() {
   var that = this;
   this.when = function(method, route, requestHandler, responseHandler) {
-    var isMatched = function(request) {
-      return (
-        (method.test ? method.test(request.method) : method === request.method) &&
-        (route.test ? route.test(request.url) : route === request.url)
-      );
-    };
-    requestHandler && requestHandlers.push(function(request, response) {
-      if(isMatched(request)) return requestHandler(request, response);
-    });
-    responseHandler && responseHandlers.push(function(request, response) {
-      if(isMatched(request)) return responseHandler(request, response);
-    });
+    requestHandlers.add(requestHandler, method, route);
+    responseHandlers.add(responseHandler, method, route);
   };
   void function() {
-    var methods = ['get', 'post', 'put', 'delete', 'patch', 'header', 'options'];
+    var methods = [ 'GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEADER', 'OPTIONS' ];
     for(var i = 0; i < methods.length; i++) void function(method) {
-      that[method] = function() {
+      that[method.toLowerCase()] = function() {
         var args = Array.prototype.slice.call(arguments);
-        args.unshift(method.toUpperCase());
-        return that.when.apply(that, args);
+        return that.when.apply(that, [method].concat(args));
       };
     }(methods[i]);
   }();
