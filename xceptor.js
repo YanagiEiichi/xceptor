@@ -1,5 +1,8 @@
 /**/ void function() { /**/
 
+
+/* Definitions */
+
 // Avoid duplicate runing
 if(XMLHttpRequest.XCeptor) return;
 
@@ -15,22 +18,22 @@ Handlers.check = function(what, value) {
 }
 Handlers.prototype = [];
 Handlers.prototype.solve = function(args, resolve, reject) {
-  var that = this;
-  var iterator = function(i) {
-    var select = function(result) {
-      switch(result) {
-        case true: return resolve && resolve();
-        case false: return reject && reject();
-        default:
-          if(result && typeof result.then === 'function') {
-            result.then(select, function(e) { throw e; });
-          } else {
-            iterator(i + 1);
-          }
+  var handlers = this;
+  // This is an asynchronous recursion to traverse handlers
+  var iterator = function(cursor) {
+    // This is an asynchronous recursion to resolve thenable resolve
+    var fixResule = function(result) {
+      switch(true) {
+        case result === true: return resolve && resolve();
+        case result === false: return reject && reject();
+        // Resolve recursively thenable result
+        case result && typeof result.then === 'function':
+          result.then(fixResule, function(error) { throw error; });
+        default: iterator(cursor + 1);
       }
     };
-    if(i < that.length) {
-      select(that[i].apply(null, args));
+    if(cursor < handlers.length) {
+      fixResule(handlers[cursor].apply(null, args));
     } else {
       resolve && resolve();
     }
@@ -46,6 +49,8 @@ Handlers.prototype.add = function(handler, method, route) {
   });
 };
 
+
+/* Main Process */
 
 // Create two handlers objects
 var requestHandlers = new Handlers();
