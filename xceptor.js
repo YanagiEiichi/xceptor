@@ -1,10 +1,29 @@
 /**/ void function() { /**/
 
+// UMD
+var umd = function(XCeptor) {
+  switch(true) {
+    // CommonJS
+    case typeof module === 'object' && !!module.exports:
+      module.exports = XCeptor;
+      break;
+    // AMD (Add a 'String' wrapper here to fuck webpack)
+    case String(typeof define) === 'function' && !!define.amd:
+      define('XCeptor', function() { return XCeptor; });
+      break;
+    // Global
+    default:
+      /**/ try { /* Fuck IE8- */
+      /**/   if(typeof execScript === 'object') execScript('var XCeptor');
+      /**/ } catch(error) {}
+      window.XCeptor = XCeptor;
+  }
+};
 
 /* Definitions */
 
 // Avoid duplicate runing
-if(XMLHttpRequest.XCeptor) return;
+if(XMLHttpRequest.XCeptor) return umd(XMLHttpRequest.XCeptor);
 
 // Save original XMLHttpRequest class
 var OriginalXMLHttpRequest = XMLHttpRequest;
@@ -31,7 +50,7 @@ Handlers.prototype.solve = function(args, resolve, reject) {
         case result === false: return reject && reject();
         // Resolve recursively thenable result
         case result && typeof result.then === 'function':
-          result.then(fixResule, function(error) { throw error; });
+          return result.then(fixResule, function(error) { throw error; });
         default: iterator(cursor + 1);
       }
     };
@@ -121,7 +140,6 @@ var SimpleEventDecorator = function(Constructor) {
   SimpleEventModel.prototype = Constructor.prototype;
   return SimpleEventModel;
 };
-
 
 /* Main Process */
 
@@ -285,22 +303,6 @@ var XCeptor = XMLHttpRequest.XCeptor = new function() {
   }();
 };
 
-// UMD
-switch(true) {
-  // CommonJS
-  case typeof module === 'object' && !!module.exports:
-    module.exports = XCeptor;
-    break;
-  // AMD (Add a 'String' wrapper here to fuck webpack)
-  case String(typeof define) === 'function' && !!define.amd:
-    define('XCeptor', function() { return XCeptor; });
-    break;
-  // Global
-  default:
-    /**/ try { /* Fuck IE8- */
-    /**/   if(typeof execScript === 'object') execScript('var XCeptor');
-    /**/ } catch(error) {}
-    window.XCeptor = XCeptor;
-}
+umd(XCeptor);
 
 /**/ }(); /**/
