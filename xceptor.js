@@ -177,7 +177,7 @@ XMLHttpRequest = function() {
     if(typeof xceptor['on' + name] === 'function') xceptor['on' + name](event);
   };
   var updateResponseHeaders = function() {
-    response.headers.splice(0);
+    response.headers.splice(0, response.headers.length);
     response.status = xhr.status;
     response.statusText = xhr.statusText;
     xhr.getAllResponseHeaders().replace(/.+/g,function(e) {
