@@ -1,3 +1,5 @@
+'use strict';
+
 /**/ void function() { /**/
 
 // UMD
@@ -151,7 +153,7 @@ XMLHttpRequest = function() {
   var request = {
     method: null,
     url: null,
-    async: true,
+    isAsync: true,
     username: void 0,
     password: void 0,
     headers: [],
@@ -165,11 +167,11 @@ XMLHttpRequest = function() {
     headers: []
   };
   // Methods mapping
-  xceptor.open = function(method, url, async, username, password) {
+  xceptor.open = function(method, url, isAsync, username, password) {
     // Save to 'request'
     request.method = (method + '').toUpperCase();
     request.url = url + '';
-    if(async !== void 0) request.async = !!(async * 1);
+    if(isAsync !== void 0) request.isAsync = !!(isAsync * 1);
     if(username !== void 0) request.username = username + '';
     if(password !== void 0) request.password = password + '';
   };
@@ -207,7 +209,7 @@ XMLHttpRequest = function() {
     // Invoke interceptor
     requestHandlers.solve([request, response], function() {
       // Actual actions
-      xhr.open(request.method, request.url, request.async, request.username, request.password);
+      xhr.open(request.method, request.url, request.isAsync, request.username, request.password);
       for(var i = 0; i < request.headers.length; i++) {
         xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
       }
