@@ -1,0 +1,28 @@
+<script src="bower_components/tester/tester.js"></script>
+<script src="../xceptor.js"></script>
+<script>
+XCeptor.get('/hello', function(req, res) {
+  res.responseText = 'hello';
+  return false;
+});
+
+XCeptor.get('?', null, function(req, res) {
+  res.responseText = String(res.responseText.length);
+});
+
+var xhr1 = new XMLHttpRequest();
+xhr1.open('GET', '/hello', false);
+xhr1.send();
+Tester.log(xhr1.responseText);
+Tester.assert(xhr1.responseText === 'hello', 'Must be "hello"');
+
+var xhr2 = new XMLHttpRequest();
+xhr2.open('GET', '?', false);
+xhr2.send();
+Tester.log(xhr2.responseText);
+Tester.assert(xhr2.responseText === '717', 'Must be "717"');
+
+setTimeout(function() {
+  Tester.feedback(true);
+}, 200);
+</script>

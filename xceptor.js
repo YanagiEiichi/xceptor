@@ -214,12 +214,13 @@ XMLHttpRequest = function() {
         xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
       }
       if(request.overridedMimeType !== void 0) xhr.overrideMimeType(request.overridedMimeType);
-      xhr.withCredentials = request.withCredentials;
-      xhr.timeout = request.timeout;
+      // Assigning before changes, because it may be thrown in sync mode
+      if(xhr.withCredentials !== request.withCredentials) xhr.withCredentials = request.withCredentials;
+      if(xhr.timeout !== request.timeout) xhr.timeout = request.timeout;
       xhr.send(request.data);
     }, function() {
       // Fake actions
-      setTimeout(function() {
+      var action = function() {
         response.readyState = 3;
         updateKeys(response, xceptor);
         trigger('readystatechange');
@@ -228,7 +229,13 @@ XMLHttpRequest = function() {
         complete();
         trigger('readystatechange');
         trigger('load');
-      });
+      };
+      // Fake async
+      if(request.isAsync) {
+        setTimeout(action);
+      } else {
+        action();
+      }
     });
   };
   xceptor.abort = function() {
