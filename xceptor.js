@@ -245,6 +245,8 @@ XMLHttpRequest = function() {
     xceptor.dispatchEvent(new Event(name, xceptor));
   };
   var updateResponseHeaders = function() {
+    if(updateResponseHeaders.disabled) return;
+    updateResponseHeaders.disabled = true;
     response.headers.splice(0, response.headers.length);
     response.status = xhr.status;
     response.statusText = xhr.statusText;
@@ -268,6 +270,7 @@ XMLHttpRequest = function() {
       updateKeys(xhr, response);
       if(xhr.readyState === 3) updateResponseHeaders();
       if(xhr.readyState === 4) {
+        updateResponseHeaders();
         complete();
         setTimeout(function() { trigger('load'); });
       }

@@ -1,7 +1,7 @@
 {
   "name": "xceptor",
   "main": "xceptor.js",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "homepage": "https://github.com/YanagiEiichi/xceptor",
   "authors": [
     "YanagiEiichi <admin@web-tinker.com>"
