@@ -1,10 +1,13 @@
 {
   "name": "xceptor",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "XMLHttpRequest Interceptor",
   "main": "xceptor.js",
   "directories": {
     "test": "tests"
+  },
+  "scripts": {
+    "prepublish": "amd2umd src/xceptor.js > xceptor.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/YanagiEiichi/xceptor/issues"
   },
-  "homepage": "https://github.com/YanagiEiichi/xceptor#readme"
+  "homepage": "https://github.com/YanagiEiichi/xceptor#readme",
+  "devDependencies": {
+    "amd2umd": "~0.0.3"
+  }
 }

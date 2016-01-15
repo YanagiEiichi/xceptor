@@ -1,31 +1,9 @@
+/**/ define('XCeptor', function() { /**/
+
 'use strict';
 
-/**/ void function() { /**/
-
-// UMD
-var umd = function(XCeptor) {
-  switch(true) {
-    // CommonJS
-    case typeof module === 'object' && !!module.exports:
-      module.exports = XCeptor;
-      break;
-    // AMD (Add a 'String' wrapper here to fuck webpack)
-    case String(typeof define) === 'function' && !!define.amd:
-      define('XCeptor', function() { return XCeptor; });
-      break;
-    // Global
-    default:
-      /**/ try { /* Fuck IE8- */
-      /**/   if(typeof execScript === 'object') execScript('var XCeptor');
-      /**/ } catch(error) {}
-      window.XCeptor = XCeptor;
-  }
-};
-
-/* Definitions */
-
 // Avoid duplicate runing
-if(XMLHttpRequest.XCeptor) return umd(XMLHttpRequest.XCeptor);
+if(XMLHttpRequest.XCeptor) return XMLHttpRequest.XCeptor;
 
 // Save original XMLHttpRequest class
 var OriginalXMLHttpRequest = XMLHttpRequest;
@@ -34,7 +12,7 @@ var OriginalXMLHttpRequest = XMLHttpRequest;
 var Handlers = function() {};
 // To use equivalence Checking
 Handlers.check = function(what, value) {
-  // Note, use a '==' here, match 'null' or 'undefined' 
+  // Note, use a '==' here, match 'null' or 'undefined'
   if(what == null || what === value) return true;
   // Check 'test' method, match RegExp or RegExp-like
   if(typeof what.test === 'function') return what.test(value);
@@ -298,7 +276,7 @@ XMLHttpRequest.prototype = {
 XMLHttpRequest = SimpleEventDecorator(XMLHttpRequest);
 
 // Define xceptor methods
-var XCeptor = XMLHttpRequest.XCeptor = new function() {
+return XMLHttpRequest.XCeptor = new function() {
   var that = this;
   this.when = function(method, route, requestHandler, responseHandler) {
     requestHandlers.add(requestHandler, method, route);
@@ -315,6 +293,4 @@ var XCeptor = XMLHttpRequest.XCeptor = new function() {
   }();
 };
 
-umd(XCeptor);
-
-/**/ }(); /**/
+/**/ }); /**/
