@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/YanagiEiichi/xceptor#readme",
   "devDependencies": {
-    "amd2umd": "~0.0.3"
+    "amd2umd": "~0.0.4"
   }
 }
