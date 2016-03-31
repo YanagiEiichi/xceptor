@@ -1,6 +1,6 @@
 {
   "name": "xceptor",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "XMLHttpRequest Interceptor",
   "main": "xceptor.js",
   "directories": {

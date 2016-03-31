@@ -124,6 +124,7 @@ var SimpleEventDecorator = function(Constructor) {
 /* Main Process */
 
 // Create interceptor
+/**/ window. /* Fuck fucking wechat in android */
 XMLHttpRequest = function() {
   var xhr = new OriginalXMLHttpRequest();
   var xceptor = this;
