@@ -1,0 +1,13 @@
+XCeptor
+<script src="bower_components/tester/tester.js"></script>
+<script src="../xceptor.js"></script>
+<script>
+var xhr = new XMLHttpRequest();
+xhr.open('GET', '?');
+xhr.responseType = 'arraybuffer';
+xhr.addEventListener('load', function() {
+  var bytes = [].slice.call(new Uint8Array(xhr.response), 0, 7);
+  Tester.feedback(String.fromCharCode.apply(String, bytes) === 'XCeptor');
+});
+xhr.send();
+</script>

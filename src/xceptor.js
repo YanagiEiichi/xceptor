@@ -138,7 +138,8 @@ XMLHttpRequest = function() {
     headers: [],
     overridedMimeType: void 0,
     timeout: xceptor.timeout,
-    withCredentials: xceptor.withCredentials
+    withCredentials: xceptor.withCredentials,
+    responseType: ''
   };
   var response = {
     status: xceptor.status,
@@ -185,6 +186,7 @@ XMLHttpRequest = function() {
     request.data = data;
     request.withCredentials = xceptor.withCredentials;
     request.timeout = xceptor.timeout;
+    request.responseType = xceptor.responseType;
     // Invoke interceptor
     requestHandlers.solve([request, response], function() {
       // Actual actions
@@ -196,6 +198,7 @@ XMLHttpRequest = function() {
       // Assigning before changes, because it may be thrown in sync mode
       if(xhr.withCredentials !== request.withCredentials) xhr.withCredentials = request.withCredentials;
       if(xhr.timeout !== request.timeout) xhr.timeout = request.timeout;
+      if(xhr.responseType !== request.responseType) xhr.responseType = request.responseType;
       xhr.send(request.data);
     }, function() {
       // Fake actions
