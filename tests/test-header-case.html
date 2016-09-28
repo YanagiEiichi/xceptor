@@ -1,0 +1,18 @@
+<script src="bower_components/tester/tester.js"></script>
+<script src="../xceptor.js"></script>
+<script>
+XCeptor.get(/^/, function(req, res) {
+  res.status = 200;
+  res.statusText = 'OK';
+  res.responseText = 'hehe';
+  res.headers = [ { header: 'HehE', value: 'hehe' } ];
+  return false;
+});
+
+var xhr = new XMLHttpRequest();
+xhr.open('GET', '/');
+xhr.onload = function() {
+  Tester.feedback(xhr.getResponseHeader('hehe') === 'hehe');
+};
+xhr.send();
+</script>

@@ -166,9 +166,9 @@ XMLHttpRequest = function() {
   xceptor.getResponseHeader = function(header) {
     // Read from 'response'
     var headers = response.headers;
-    header = header + '';
+    header = String(header).toLowerCase();
     for(var i = 0; i < headers.length; i++) {
-      if(headers[i].header === header) return headers[i].value;
+      if(headers[i].header.toLowerCase() === header) return headers[i].value;
     }
     return null;
   };
