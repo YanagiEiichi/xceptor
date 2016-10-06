@@ -1,7 +1,7 @@
 {
   "name": "xceptor",
   "version": "0.2.9",
-  "description": "XMLHttpRequest Interceptor",
+  "description": "AN INTERCEPTOR OF XHR",
   "main": "xceptor.js",
   "directories": {
     "test": "tests"
@@ -23,5 +23,17 @@
   "devDependencies": {
     "amd2umd": "~0.0.4",
     "ui-tester": "^1.1.3"
+  },
+  "reciperConfig": {
+    "darkColor": "#333",
+    "normalColor": "#666",
+    "primaryColor": "#000",
+    "logoUrl": "",
+    "languages": [ "xml", "markdown", "bash" ],
+    "home": "/xceptor/",
+    "items": [
+      { "text": "Introduction", "href": "/xceptor/docs/intro/" },
+      { "text": "Github", "href": "//github.com/YanagiEiichi/xceptor/", "target": "_blank" }
+    ]
   }
 }

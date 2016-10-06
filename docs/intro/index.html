@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="renderer" content="webkit" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
+    <script>
+      if (!window.fetch) document.write('<script src="//github.elemecdn.com/uglifyjs!github/fetch/v0.11.0/fetch.js"><\/script>');
+    </script>
+    <script src="//yanagieiichi.github.io/reciper/index.js"></script>
+    <script>
+      fetch('/xceptor/package.json').then(function(response) { return response.json(); }).then(function(pkg) {
+        var config = pkg.reciperConfig;
+        config.name = pkg.name;
+        config.description = pkg.description;
+        reciper(config);
+      });
+    </script>
+  </head>
+</html>
