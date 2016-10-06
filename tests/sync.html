@@ -1,5 +1,5 @@
-<script src="bower_components/tester/tester.js"></script>
-<script src="../xceptor.js"></script>
+<script src="/tester.js"></script>
+<script src="/xceptor.js"></script>
 <script>
 XCeptor.get('/hello', function(req, res) {
   res.responseText = 'hello';
@@ -20,7 +20,7 @@ var xhr2 = new XMLHttpRequest();
 xhr2.open('GET', '?', false);
 xhr2.send();
 Tester.log(xhr2.responseText);
-Tester.assert(xhr2.responseText === '717', 'Must be "717"');
+Tester.assert(xhr2.responseText === '692', 'Must be "692"');
 
 setTimeout(function() {
   Tester.feedback(true);

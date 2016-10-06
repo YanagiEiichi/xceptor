@@ -1,30 +1,23 @@
-<script src="bower_components/tester/tester.js"></script>
-<script>
-if(!-[1,]) {
-  Tester.log('IE 8 ignore');
-  Tester.feedback(true);
-  document.write('<!--');
-}
-</script>
-<script src="bower_components/jquery2/dist/jquery.js"></script>
-<script src="../xceptor.js"></script>
+<script src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="/tester.js"></script>
+<script src="/xceptor.js"></script>
 <script>
 XCeptor.get(/^\/api/, function(req, res) {
   res.responseText = 'Hello';
 });
-
+</script>
+<script src="/xceptor.js"></script>
+<script>
 XCeptor.get(/^\/api/, function(req, res) {
-  // Set a 200 response
   res.status = 200;
   res.statusText = 'OK';
-  // Set data
   res.responseText += ' World';
-  // Do not launch
   return false;
 });
-
+</script>
+<script src="/xceptor.js"></script>
+<script>
 $.when(
-  $.get('?'),
   $.get('/api').then(function(text, state, response) {
     Tester.assert(response.status === 200);
     Tester.assert(response.responseText === 'Hello World');
