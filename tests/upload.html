@@ -1,0 +1,10 @@
+<script src="/tester.js"></script>
+<script src="/xceptor.js"></script>
+<script>
+var xhr = new XMLHttpRequest();
+xhr.open('POST', '?');
+xhr.upload.onprogress = () => {
+  Tester.feedback(true);
+};
+xhr.send('a');
+</script>

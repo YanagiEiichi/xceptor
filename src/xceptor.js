@@ -61,6 +61,7 @@ void function() {
   var keys = [
     'readyState',
     'timeout',
+    'upload',
     'withCredentials',
     'status',
     'statusText',

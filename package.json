@@ -8,7 +8,7 @@
   },
   "scripts": {
     "prepublish": "amd2umd src/xceptor.js > xceptor.js",
-    "test": "ui-tester-start tests"
+    "test": "npm run prepublish && ui-tester-start tests"
   },
   "repository": {
     "type": "git",
