@@ -1,0 +1,22 @@
+<script src="/tester.js"></script>
+<script src="/xceptor.js"></script>
+<script>
+[
+  'abort',
+  'getAllResponseHeaders',
+  'getResponseHeader',
+  'overrideMimeType',
+  'open',
+  'send',
+  'setRequestHeader'
+].forEach(key => {
+  try {
+    XMLHttpRequest.prototype[key]()
+    Tester.assert(false);
+  } catch (error) {
+    Tester.assert(error instanceof TypeError);
+    Tester.log(key + ' => ' + error.message);
+  }
+});
+Tester.feedback(true);
+</script>

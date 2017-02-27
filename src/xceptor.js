@@ -127,6 +127,7 @@ define('XCeptor', function() {
   // Create interceptor
   /**/ window. /* Fuck fucking wechat in android */ // eslint-disable-line dot-location
   XMLHttpRequest = function() {
+    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Failed to construct \'XMLHttpRequest\': Please use the \'new\' operator, this DOM object constructor cannot be called as a function.');
     var xceptor = this;
     var xhr = xceptor.__originalXHR = new OriginalXMLHttpRequest();
     updateKeys(xhr, xceptor);
@@ -203,6 +204,7 @@ define('XCeptor', function() {
 
   // Methods mapping
   XMLHttpRequest.prototype.open = function(method, url, isAsync, username, password) {
+    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
     var request = this.__request;
     // Save to 'request'
     request.method = (method + '').toUpperCase();
@@ -213,16 +215,19 @@ define('XCeptor', function() {
   };
 
   XMLHttpRequest.prototype.setRequestHeader = function(header, value) {
+    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
     // Save to 'headers'
     this.__request.headers.push({ header: header + '', value: value });
   };
 
   XMLHttpRequest.prototype.overrideMimeType = function(mimetype) {
+    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
     // Save to 'request'
     this.__request.overridedMimeType = mimetype;
   };
 
   XMLHttpRequest.prototype.getResponseHeader = function(header) {
+    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
     // Read from 'response'
     var headers = this.__response.headers;
     header = String(header).toLowerCase();
@@ -233,6 +238,7 @@ define('XCeptor', function() {
   };
 
   XMLHttpRequest.prototype.getAllResponseHeaders = function() {
+    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
     // Read from 'response'
     var response = this.__response;
     var headers = response.headers;
@@ -244,6 +250,7 @@ define('XCeptor', function() {
   };
 
   XMLHttpRequest.prototype.send = function(data) {
+    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
     // Copy setter properties to 'request'
     var request = this.__request;
     var response = this.__response;
@@ -288,6 +295,7 @@ define('XCeptor', function() {
   };
 
   XMLHttpRequest.prototype.abort = function() {
+    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
     this.__originalXHR.abort();
   };
 

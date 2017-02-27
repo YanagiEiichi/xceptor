@@ -1,0 +1,11 @@
+<script src="/tester.js"></script>
+<script src="/xceptor.js"></script>
+<script>
+try {
+  XMLHttpRequest();
+} catch (error) {
+  Tester.assert(error instanceof TypeError);
+  Tester.assert(/XMLHttpRequest/.test(error.message));
+  Tester.feedback(true);
+}
+</script>
