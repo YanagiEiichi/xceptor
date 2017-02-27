@@ -127,10 +127,10 @@ var SimpleEventDecorator = function(Constructor) {
 // Create interceptor
 /**/ window. /* Fuck fucking wechat in android */
 XMLHttpRequest = function() {
-  var xhr = new OriginalXMLHttpRequest();
   var xceptor = this;
+  var xhr = xceptor.__originalXHR = new OriginalXMLHttpRequest();
   updateKeys(xhr, xceptor);
-  var request = {
+  var request = xceptor.__request = {
     method: null,
     url: null,
     isAsync: true,
@@ -142,90 +142,18 @@ XMLHttpRequest = function() {
     withCredentials: xceptor.withCredentials,
     responseType: ''
   };
-  var response = {
+  var response = xceptor.__response = {
     status: xceptor.status,
     statusText: xceptor.statusText,
     headers: []
   };
-  // Methods mapping
-  xceptor.open = function(method, url, isAsync, username, password) {
-    // Save to 'request'
-    request.method = (method + '').toUpperCase();
-    request.url = url + '';
-    if(isAsync !== void 0) request.isAsync = !!(isAsync * 1);
-    if(username !== void 0) request.username = username + '';
-    if(password !== void 0) request.password = password + '';
-  };
-  xceptor.setRequestHeader = function(header, value) {
-    // Save to 'headers'
-    request.headers.push({ header: header + '', value: value });
-  };
-  xceptor.overrideMimeType = function(mimetype) {
-    // Save to 'request'
-    request.overridedMimeType = mimetype;
-  };
-  xceptor.getResponseHeader = function(header) {
-    // Read from 'response'
-    var headers = response.headers;
-    header = String(header).toLowerCase();
-    for(var i = 0; i < headers.length; i++) {
-      if(headers[i].header.toLowerCase() === header) return headers[i].value;
-    }
-    return null;
-  };
-  xceptor.getAllResponseHeaders = function() {
-    // Read from 'response'
-    var headers = response.headers;
-    var allHeaders = [];
-    for(var i = 0; i < response.headers.length; i++) {
-      allHeaders.push(headers[i].header + ': ' + headers[i].value);
-    }
-    return allHeaders.join('\r\n');
-  };
-  xceptor.send = function(data) {
-    // Copy setter properties to 'request'
-    request.data = data;
-    request.withCredentials = xceptor.withCredentials;
-    request.timeout = xceptor.timeout;
-    request.responseType = xceptor.responseType;
-    // Invoke interceptor
-    requestHandlers.solve([request, response], function() {
-      // Actual actions
-      xhr.open(request.method, request.url, request.isAsync, request.username, request.password);
-      for(var i = 0; i < request.headers.length; i++) {
-        xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
-      }
-      if(request.overridedMimeType !== void 0) xhr.overrideMimeType(request.overridedMimeType);
-      // Assigning before changes, because it may be thrown in sync mode
-      if(xhr.withCredentials !== request.withCredentials) xhr.withCredentials = request.withCredentials;
-      if(xhr.timeout !== request.timeout) xhr.timeout = request.timeout;
-      if(xhr.responseType !== request.responseType) xhr.responseType = request.responseType;
-      xhr.send(request.data);
-    }, function() {
-      // Fake actions
-      var action = function() {
-        response.readyState = 3;
-        updateKeys(response, xceptor);
-        trigger('readystatechange');
-        response.readyState = 4;
-        updateKeys(response, xceptor);
-        complete();
-        trigger('readystatechange');
-        trigger('load');
-      };
-      // Fake async
-      if(request.isAsync) {
-        setTimeout(action);
-      } else {
-        action();
-      }
-    });
-  };
-  xceptor.abort = function() {
-    xhr.abort();
-  };
-  var trigger = function(name) {
+  var trigger = xceptor.__trigger = function(name) {
     xceptor.dispatchEvent(new Event(name, xceptor));
+  };
+  var complete = xceptor.__complete = function() {
+    responseHandlers.solve([xceptor.__request, xceptor.__response], function() {
+      updateKeys(xceptor.__response, xceptor);
+    });
   };
   var updateResponseHeaders = function() {
     if(updateResponseHeaders.disabled) return;
@@ -237,11 +165,6 @@ XMLHttpRequest = function() {
       var result = $0.match(/(^.*?): (.*$)/);
       if(!result) return;
       response.headers.push({ header: result[1], value: result[2] });
-    });
-  };
-  var complete = function() {
-    responseHandlers.solve([request, response], function() {
-      updateKeys(response, xceptor);
     });
   };
   // Mapping response
@@ -276,6 +199,97 @@ XMLHttpRequest.prototype = {
   LOADING: 3,
   OPENED: 1,
   UNSENT: 0
+};
+
+// Methods mapping
+XMLHttpRequest.prototype.open = function(method, url, isAsync, username, password) {
+  var request = this.__request;
+  // Save to 'request'
+  request.method = (method + '').toUpperCase();
+  request.url = url + '';
+  if(isAsync !== void 0) request.isAsync = !!(isAsync * 1);
+  if(username !== void 0) request.username = username + '';
+  if(password !== void 0) request.password = password + '';
+};
+
+XMLHttpRequest.prototype.setRequestHeader = function(header, value) {
+  // Save to 'headers'
+  this.__request.headers.push({ header: header + '', value: value });
+};
+
+XMLHttpRequest.prototype.overrideMimeType = function(mimetype) {
+  // Save to 'request'
+  this.__request.overridedMimeType = mimetype;
+};
+
+XMLHttpRequest.prototype.getResponseHeader = function(header) {
+  // Read from 'response'
+  var headers = this.__response.headers;
+  header = String(header).toLowerCase();
+  for(var i = 0; i < headers.length; i++) {
+    if(headers[i].header.toLowerCase() === header) return headers[i].value;
+  }
+  return null;
+};
+
+XMLHttpRequest.prototype.getAllResponseHeaders = function() {
+  // Read from 'response'
+  var response = this.__response;
+  var headers = response.headers;
+  var allHeaders = [];
+  for(var i = 0; i < response.headers.length; i++) {
+    allHeaders.push(headers[i].header + ': ' + headers[i].value);
+  }
+  return allHeaders.join('\r\n');
+};
+
+XMLHttpRequest.prototype.send = function(data) {
+  // Copy setter properties to 'request'
+  console.log(this instanceof XMLHttpRequest);
+  var request = this.__request;
+  var response = this.__response;
+  request.data = data;
+  request.withCredentials = this.withCredentials;
+  request.timeout = this.timeout;
+  request.responseType = this.responseType;
+  var that = this;
+  // Invoke interceptor
+  requestHandlers.solve([request, response], function() {
+    // Actual actions
+    var xhr = that.__originalXHR;
+    xhr.open(request.method, request.url, request.isAsync, request.username, request.password);
+    for(var i = 0; i < request.headers.length; i++) {
+      xhr.setRequestHeader(request.headers[i].header, request.headers[i].value);
+    }
+    if(request.overridedMimeType !== void 0) xhr.overrideMimeType(request.overridedMimeType);
+    // Assigning before changes, because it may be thrown in sync mode
+    if(xhr.withCredentials !== request.withCredentials) xhr.withCredentials = request.withCredentials;
+    if(xhr.timeout !== request.timeout) xhr.timeout = request.timeout;
+    if(xhr.responseType !== request.responseType) xhr.responseType = request.responseType;
+    xhr.send(request.data);
+  }, function() {
+    // Fake actions
+    var action = function() {
+      response.readyState = 3;
+      updateKeys(response, that);
+      that.__trigger('readystatechange');
+      response.readyState = 4;
+      updateKeys(response, that);
+      that.__complete();
+      that.__trigger('readystatechange');
+      that.__trigger('load');
+    };
+    // Fake async
+    if(request.isAsync) {
+      setTimeout(action);
+    } else {
+      action();
+    }
+  });
+};
+
+XMLHttpRequest.prototype.abort = function() {
+  this.abort();
 };
 
 XMLHttpRequest = SimpleEventDecorator(XMLHttpRequest);
