@@ -1,0 +1,11 @@
+<script src="/tester.js"></script>
+<script src="/xceptor.js"></script>
+<script>
+let xhr = new XMLHttpRequest();
+xhr.open('GET', '?');
+xhr.onabort = () => {
+  Tester.feedback(true);
+};
+xhr.send();
+xhr.abort();
+</script>

@@ -182,7 +182,7 @@ define('XCeptor', function() {
         }
         trigger('readystatechange');
       };
-      var events = [ 'error', 'timeout' ];
+      var events = [ 'error', 'timeout', 'abort' ];
       var buildEvent = function(name) {
         xhr['on' + name] = function() {
           xceptor.readyState = xhr.readyState;
@@ -288,7 +288,7 @@ define('XCeptor', function() {
   };
 
   XMLHttpRequest.prototype.abort = function() {
-    this.abort();
+    this.__originalXHR.abort();
   };
 
   /**/ window. /* Fuck fucking wechat in android */ // eslint-disable-line dot-location
