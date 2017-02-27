@@ -1,6 +1,6 @@
 {
   "name": "xceptor",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "AN INTERCEPTOR OF XHR",
   "main": "xceptor.js",
   "directories": {
