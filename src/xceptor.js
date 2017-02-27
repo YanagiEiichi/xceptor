@@ -158,7 +158,7 @@ XMLHttpRequest = function() {
   };
   xceptor.setRequestHeader = function(header, value) {
     // Save to 'headers'
-    request.headers.push({ header: header + '', value: value + '' });
+    request.headers.push({ header: header + '', value: value });
   };
   xceptor.overrideMimeType = function(mimetype) {
     // Save to 'request'
