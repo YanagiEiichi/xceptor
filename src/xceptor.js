@@ -179,7 +179,11 @@ define('XCeptor', function() {
         if (xhr.readyState === 4) {
           updateResponseHeaders();
           complete();
-          setTimeout(function() { trigger('load'); });
+          if (request.isAsync) {
+            setTimeout(function() { trigger('load'); });
+          } else {
+            trigger('load');
+          }
         }
         trigger('readystatechange');
       };
