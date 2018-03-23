@@ -198,14 +198,6 @@ define('XCeptor', function() {
     }();
   };
 
-  XMLHttpRequest.prototype = {
-    DONE: 4,
-    HEADERS_RECEIVED: 2,
-    LOADING: 3,
-    OPENED: 1,
-    UNSENT: 0
-  };
-
   // Methods mapping
   XMLHttpRequest.prototype.open = function(method, url, isAsync, username, password) {
     if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
@@ -306,8 +298,15 @@ define('XCeptor', function() {
   /**/ window. /* Fuck fucking wechat in android */ // eslint-disable-line dot-location
   XMLHttpRequest = SimpleEventDecorator(XMLHttpRequest);
 
+  // Copy constant names to constructor and prototype
+  var constantNames = [ 'UNSENT', 'OPENED', 'HEADERS_RECEIVED', 'LOADING', 'DONE' ];
+  for (var i = 0; i < constantNames.length; i++) {
+    XMLHttpRequest[constantNames[i]] = OriginalXMLHttpRequest[constantNames[i]];
+    XMLHttpRequest.prototype[constantNames[i]] = OriginalXMLHttpRequest[constantNames[i]];
+  }
+
   // Define xceptor methods
-  return XMLHttpRequest.XCeptor = new function() {
+  let XCeptor = new function() {
     var that = this;
     this.when = function(method, route, requestHandler, responseHandler) {
       requestHandlers.add(requestHandler, method, route);
@@ -323,5 +322,13 @@ define('XCeptor', function() {
       }(methods[i]);
     }();
   };
+
+  try {
+    Object.defineProperty(XMLHttpRequest, 'XCeptor', { value: XCeptor, configurable: true });
+  } catch (error) {
+    XMLHttpRequest.XCeptor = XCeptor;
+  }
+
+  return XCeptor;
 
 });
