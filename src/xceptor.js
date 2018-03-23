@@ -306,7 +306,7 @@ define('XCeptor', function() {
   }
 
   // Define xceptor methods
-  let XCeptor = new function() {
+  var XCeptor = new function() {
     var that = this;
     this.when = function(method, route, requestHandler, responseHandler) {
       requestHandlers.add(requestHandler, method, route);
