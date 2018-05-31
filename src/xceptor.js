@@ -175,9 +175,8 @@ define('XCeptor', function() {
       xhr.onreadystatechange = function() {
         updateKeys(xhr, xceptor);
         updateKeys(xhr, response);
-        if (xhr.readyState === 3) updateResponseHeaders();
+        if (xhr.readyState > 1) updateResponseHeaders();
         if (xhr.readyState === 4) {
-          updateResponseHeaders();
           complete();
           if (request.isAsync) {
             setTimeout(function() { trigger('load'); });
