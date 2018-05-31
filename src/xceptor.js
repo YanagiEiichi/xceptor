@@ -106,17 +106,20 @@ define('XCeptor', function() {
         if (list[i] === handler) list.splice(i, 1), i = 0 / 0;
       }
     };
-    var dispatchEvent = function(event) {
-      var list = heap(this, event.type);
-      for (var i = 0; i < list.length; i++) list[i](event);
-      var key = 'on' + event.type;
-      if (typeof this[key] === 'function') this[key](event);
+    var wrapDispatchEvent = function(context) {
+      var dispatchEvent = function(event) {
+        var list = heap(this, event.type);
+        for (var i = 0; i < list.length; i++) list[i].call(context, event);
+        var key = 'on' + event.type;
+        if (typeof this[key] === 'function') this[key].call(context, event);
+      };
+      return dispatchEvent;
     };
     var SimpleEventModel = function() {
       Constructor.apply(this, arguments);
       this.addEventListener = addEventListener;
       this.removeEventListener = removeEventListener;
-      this.dispatchEvent = dispatchEvent;
+      this.dispatchEvent = wrapDispatchEvent(this);
     };
     SimpleEventModel.prototype = Constructor.prototype;
     return SimpleEventModel;
@@ -175,9 +178,8 @@ define('XCeptor', function() {
       xhr.onreadystatechange = function() {
         updateKeys(xhr, xceptor);
         updateKeys(xhr, response);
-        if (xhr.readyState === 3) updateResponseHeaders();
+        if (xhr.readyState > 1) updateResponseHeaders();
         if (xhr.readyState === 4) {
-          updateResponseHeaders();
           complete();
           if (request.isAsync) {
             setTimeout(function() { trigger('load'); });
