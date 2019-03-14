@@ -128,9 +128,8 @@ define('XCeptor', function() {
   /* Main Process */
 
   // Create interceptor
-  /**/ window. /* Fuck fucking wechat in android */ // eslint-disable-line dot-location
-  XMLHttpRequest = function() {
-    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Failed to construct \'XMLHttpRequest\': Please use the \'new\' operator, this DOM object constructor cannot be called as a function.');
+  var HijackedXHR = function() {
+    if (!(this instanceof HijackedXHR)) throw new TypeError('Failed to construct \'XMLHttpRequest\': Please use the \'new\' operator, this DOM object constructor cannot be called as a function.');
     var xceptor = this;
     var xhr = xceptor.__originalXHR = new OriginalXMLHttpRequest();
     updateKeys(xhr, xceptor);
@@ -201,8 +200,8 @@ define('XCeptor', function() {
   };
 
   // Methods mapping
-  XMLHttpRequest.prototype.open = function(method, url, isAsync, username, password) {
-    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
+  HijackedXHR.prototype.open = function(method, url, isAsync, username, password) {
+    if (!(this instanceof HijackedXHR)) throw new TypeError('Illegal invocation');
     var request = this.__request;
     // Save to 'request'
     request.method = (method + '').toUpperCase();
@@ -212,20 +211,20 @@ define('XCeptor', function() {
     if (password !== void 0) request.password = password + '';
   };
 
-  XMLHttpRequest.prototype.setRequestHeader = function(header, value) {
-    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
+  HijackedXHR.prototype.setRequestHeader = function(header, value) {
+    if (!(this instanceof HijackedXHR)) throw new TypeError('Illegal invocation');
     // Save to 'headers'
     this.__request.headers.push({ header: header + '', value: value });
   };
 
-  XMLHttpRequest.prototype.overrideMimeType = function(mimetype) {
-    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
+  HijackedXHR.prototype.overrideMimeType = function(mimetype) {
+    if (!(this instanceof HijackedXHR)) throw new TypeError('Illegal invocation');
     // Save to 'request'
     this.__request.overridedMimeType = mimetype;
   };
 
-  XMLHttpRequest.prototype.getResponseHeader = function(header) {
-    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
+  HijackedXHR.prototype.getResponseHeader = function(header) {
+    if (!(this instanceof HijackedXHR)) throw new TypeError('Illegal invocation');
     // Read from 'response'
     var headers = this.__response.headers;
     header = String(header).toLowerCase();
@@ -235,8 +234,8 @@ define('XCeptor', function() {
     return null;
   };
 
-  XMLHttpRequest.prototype.getAllResponseHeaders = function() {
-    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
+  HijackedXHR.prototype.getAllResponseHeaders = function() {
+    if (!(this instanceof HijackedXHR)) throw new TypeError('Illegal invocation');
     // Read from 'response'
     var response = this.__response;
     var headers = response.headers;
@@ -247,8 +246,8 @@ define('XCeptor', function() {
     return allHeaders.join('\r\n');
   };
 
-  XMLHttpRequest.prototype.send = function(data) {
-    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
+  HijackedXHR.prototype.send = function(data) {
+    if (!(this instanceof HijackedXHR)) throw new TypeError('Illegal invocation');
     // Copy setter properties to 'request'
     var request = this.__request;
     var response = this.__response;
@@ -292,20 +291,22 @@ define('XCeptor', function() {
     });
   };
 
-  XMLHttpRequest.prototype.abort = function() {
-    if (!(this instanceof XMLHttpRequest)) throw new TypeError('Illegal invocation');
+  HijackedXHR.prototype.abort = function() {
+    if (!(this instanceof HijackedXHR)) throw new TypeError('Illegal invocation');
     this.__originalXHR.abort();
   };
 
-  /**/ window. /* Fuck fucking wechat in android */ // eslint-disable-line dot-location
-  XMLHttpRequest = SimpleEventDecorator(XMLHttpRequest);
+  HijackedXHR = SimpleEventDecorator(HijackedXHR);
 
   // Copy constant names to constructor and prototype
   var constantNames = [ 'UNSENT', 'OPENED', 'HEADERS_RECEIVED', 'LOADING', 'DONE' ];
   for (var i = 0; i < constantNames.length; i++) {
-    XMLHttpRequest[constantNames[i]] = OriginalXMLHttpRequest[constantNames[i]];
-    XMLHttpRequest.prototype[constantNames[i]] = OriginalXMLHttpRequest[constantNames[i]];
+    HijackedXHR[constantNames[i]] = OriginalXMLHttpRequest[constantNames[i]];
+    HijackedXHR.prototype[constantNames[i]] = OriginalXMLHttpRequest[constantNames[i]];
   }
+
+  // Exports
+  window.XMLHttpRequest = HijackedXHR;
 
   // Define xceptor methods
   var XCeptor = new function() {
@@ -326,9 +327,9 @@ define('XCeptor', function() {
   };
 
   try {
-    Object.defineProperty(XMLHttpRequest, 'XCeptor', { value: XCeptor, configurable: true });
+    Object.defineProperty(HijackedXHR, 'XCeptor', { value: XCeptor, configurable: true });
   } catch (error) {
-    XMLHttpRequest.XCeptor = XCeptor;
+    HijackedXHR.XCeptor = XCeptor;
   }
 
   return XCeptor;

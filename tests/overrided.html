@@ -1,0 +1,10 @@
+<script src="/tester.js"></script>
+<script src="/xceptor.js"></script>
+<script>
+let XHR = XMLHttpRequest;
+XMLHttpRequest = function(...args) {
+  return new XHR(...args);
+};
+new XMLHttpRequest();
+Tester.feedback(true);
+</script>
