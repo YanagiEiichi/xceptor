@@ -1,0 +1,28 @@
+<script src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="/tester.js"></script>
+<script src="/xceptor.js"></script>
+<script>
+let expection = new Tester.Expection(
+  1, 1,
+  2, 2,
+  3, 3,
+  4, 4
+).feedback();
+
+let desc = Object.getOwnPropertyDescriptor(XMLHttpRequest.prototype, 'readyState');
+Object.defineProperty(XMLHttpRequest.prototype, 'readyState', {
+  set: value => Tester.feedback(false),
+  get: function() {
+    let value = desc.get.call(this);
+    expection.answer(value);
+    return value;
+  }
+});
+
+let xhr = new XMLHttpRequest();
+xhr.onreadystatechange = () => {
+  expection.answer(xhr.readyState);
+};
+xhr.open('GET', '/');
+xhr.send();
+</script>

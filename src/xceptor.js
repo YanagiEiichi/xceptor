@@ -55,34 +55,36 @@ define('XCeptor', function() {
   var requestHandlers = new Handlers();
   var responseHandlers = new Handlers();
 
+  var propPrefix = '__internal_';
+  var propKeys = [
+    'readyState',
+    'timeout',
+    'upload',
+    'withCredentials',
+    'status',
+    'statusText',
+    'responseURL',
+    'responseType',
+    'response',
+    'responseText',
+    'responseXML'
+  ];
+
   // To sync object keys with xhr
-  var updateKeys;
-  void function() {
-    var keys = [
-      'readyState',
-      'timeout',
-      'upload',
-      'withCredentials',
-      'status',
-      'statusText',
-      'responseURL',
-      'responseType',
-      'response',
-      'responseText',
-      'responseXML'
-    ];
-    updateKeys = function(from, to, filter) {
-      for (var i = 0, key; (key = keys[i]); i++) {
-        if (filter && !filter.test(key)) continue;
-        /**/ try { /* Fuck Android 4.3- and IE */ // eslint-disable-line no-multi-spaces
-        /**/   void to[key], void from[key]; // eslint-disable-line no-multi-spaces, indent
-        /**/ } catch (error) { // eslint-disable-line no-multi-spaces
-        /**/   continue; // eslint-disable-line no-multi-spaces, indent
-        /**/ } // eslint-disable-line no-multi-spaces
-        to[key] = from[key];
-      }
-    };
-  }();
+  var updateKeys = function(from, to, filter) {
+    for (var i = 0, key; (key = propKeys[i]); i++) {
+      if (filter && !filter.test(key)) continue;
+      var xKey = propPrefix + key;
+      var toKey = xKey in to ? xKey : key;
+      var fromKey = xKey in from ? xKey : key;
+      /**/ try { /* Fuck Android 4.3- and IE */ // eslint-disable-line no-multi-spaces
+      /**/   void to[toKey], void from[fromKey]; // eslint-disable-line no-multi-spaces, indent
+      /**/ } catch (error) { // eslint-disable-line no-multi-spaces
+      /**/   continue; // eslint-disable-line no-multi-spaces, indent
+      /**/ } // eslint-disable-line no-multi-spaces
+      to[toKey] = from[fromKey];
+    }
+  };
 
   // Event internal class
   var Event = function(type, target) {
@@ -92,9 +94,8 @@ define('XCeptor', function() {
 
   // SimpleEventModel internal decorator
   var SimpleEventDecorator = function(Constructor) {
-    var token = '__events__';
     var heap = function(object, name) {
-      var events = token in object ? object[token] : object[token] = {};
+      var events = object.__events__;
       return name in events ? events[name] : events[name] = [];
     };
     var addEventListener = function(name, handler) {
@@ -117,9 +118,10 @@ define('XCeptor', function() {
     };
     var SimpleEventModel = function() {
       Constructor.apply(this, arguments);
-      this.addEventListener = addEventListener;
-      this.removeEventListener = removeEventListener;
-      this.dispatchEvent = wrapDispatchEvent(this);
+      Object.defineProperty(this, '__events__', { value: {}, configurable: true });
+      Object.defineProperty(this, 'addEventListener', { value: addEventListener, configurable: true });
+      Object.defineProperty(this, 'removeEventListener', { value: removeEventListener, configurable: true });
+      Object.defineProperty(this, 'dispatchEvent', { value: wrapDispatchEvent(this), configurable: true });
     };
     SimpleEventModel.prototype = Constructor.prototype;
     return SimpleEventModel;
@@ -131,9 +133,16 @@ define('XCeptor', function() {
   var HijackedXHR = function() {
     if (!(this instanceof HijackedXHR)) throw new TypeError('Failed to construct \'XMLHttpRequest\': Please use the \'new\' operator, this DOM object constructor cannot be called as a function.');
     var xceptor = this;
-    var xhr = xceptor.__originalXHR = new OriginalXMLHttpRequest();
+    var xhr = new OriginalXMLHttpRequest();
+    // Init prop slots
+    void function() {
+      for (var i = 0, key; (key = propKeys[i]); i++) {
+        Object.defineProperty(xceptor, propPrefix + key, { configurable: true, writable: true });
+      }
+    }();
+    // Update default values
     updateKeys(xhr, xceptor);
-    var request = xceptor.__request = {
+    var request = {
       method: null,
       url: null,
       isAsync: true,
@@ -145,19 +154,18 @@ define('XCeptor', function() {
       withCredentials: xceptor.withCredentials,
       responseType: ''
     };
-    var response = xceptor.__response = {
-      status: xceptor.status,
-      statusText: xceptor.statusText,
-      headers: []
-    };
-    var trigger = xceptor.__trigger = function(name) {
-      xceptor.dispatchEvent(new Event(name, xceptor));
-    };
-    var complete = xceptor.__complete = function() {
+    var response = { status: xceptor.status, statusText: xceptor.statusText, headers: [] };
+    var trigger = function(name) { xceptor.dispatchEvent(new Event(name, xceptor)); };
+    var complete = function() {
       responseHandlers.solve([xceptor.__request, xceptor.__response], function() {
         updateKeys(xceptor.__response, xceptor);
       });
     };
+    Object.defineProperty(xceptor, '__originalXHR', { value: xhr, configurable: true });
+    Object.defineProperty(xceptor, '__request', { value: request, configurable: true });
+    Object.defineProperty(xceptor, '__response', { value: response, configurable: true });
+    Object.defineProperty(xceptor, '__trigger', { value: trigger, configurable: true });
+    Object.defineProperty(xceptor, '__complete', { value: complete, configurable: true });
     var updateResponseHeaders = function() {
       if (updateResponseHeaders.disabled) return;
       updateResponseHeaders.disabled = true;
@@ -296,6 +304,18 @@ define('XCeptor', function() {
     this.__originalXHR.abort();
   };
 
+  // Set accessor props
+  void function() {
+    for (var i = 0, key; (key = propKeys[i]); i++) void function(key) {
+      Object.defineProperty(HijackedXHR.prototype, key, {
+        configurable: true,
+        enumerable: true,
+        set: function(value) { this[propPrefix + key] = value; },
+        get: function() { return this[propPrefix + key]; }
+      });
+    }(key);
+  }();
+
   HijackedXHR = SimpleEventDecorator(HijackedXHR);
 
   // Copy constant names to constructor and prototype
@@ -326,11 +346,7 @@ define('XCeptor', function() {
     }();
   };
 
-  try {
-    Object.defineProperty(HijackedXHR, 'XCeptor', { value: XCeptor, configurable: true });
-  } catch (error) {
-    HijackedXHR.XCeptor = XCeptor;
-  }
+  Object.defineProperty(HijackedXHR, 'XCeptor', { value: XCeptor, configurable: true });
 
   return XCeptor;
 
