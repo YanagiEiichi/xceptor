@@ -8,7 +8,8 @@
   },
   "scripts": {
     "prepublish": "global2umd src/xceptor.js XCeptor > xceptor.js",
-    "test": "npm run prepublish && ui-tester-start tests"
+    "test": "npm run lint && npm run prepublish && ui-tester-start tests",
+    "lint": "eslint src"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/YanagiEiichi/xceptor#readme",
   "devDependencies": {
+    "eslint": "^5.15.3",
     "global2umd": "0.0.1",
     "ui-tester": "^1.2.2"
   },

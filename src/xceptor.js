@@ -1,4 +1,4 @@
-var XCeptor = (function() {
+var XCeptor = (function() { // eslint-disable-line no-unused-vars
 
   'use strict';
 
