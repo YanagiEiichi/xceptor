@@ -1,4 +1,4 @@
-define('XCeptor', function() {
+var XCeptor = (function() {
 
   'use strict';
 
@@ -350,4 +350,4 @@ define('XCeptor', function() {
 
   return XCeptor;
 
-});
+})();

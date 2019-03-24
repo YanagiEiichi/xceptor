@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "prepublish": "amd2umd src/xceptor.js > xceptor.js",
+    "prepublish": "global2umd src/xceptor.js XCeptor > xceptor.js",
     "test": "npm run prepublish && ui-tester-start tests"
   },
   "repository": {
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/YanagiEiichi/xceptor#readme",
   "devDependencies": {
-    "amd2umd": "~0.0.6",
+    "global2umd": "0.0.1",
     "ui-tester": "^1.2.2"
   },
   "reciperConfig": {
