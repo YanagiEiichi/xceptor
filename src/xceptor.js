@@ -118,10 +118,21 @@ var XCeptor = (function() { // eslint-disable-line no-unused-vars
     };
     var SimpleEventModel = function() {
       Constructor.apply(this, arguments);
-      Object.defineProperty(this, '__events__', { value: {}, configurable: true });
-      Object.defineProperty(this, 'addEventListener', { value: addEventListener, configurable: true });
-      Object.defineProperty(this, 'removeEventListener', { value: removeEventListener, configurable: true });
-      Object.defineProperty(this, 'dispatchEvent', { value: wrapDispatchEvent(this), configurable: true });
+      var nullDesc = { value: null, writable: true, configurable: true };
+      Object.defineProperties(this, {
+        onabort: nullDesc,
+        onerror: nullDesc,
+        onload: nullDesc,
+        onloadend: nullDesc,
+        onloadstart: nullDesc,
+        onprogress: nullDesc,
+        onreadystatechange: nullDesc,
+        ontimeout: nullDesc,
+        addEventListener: { value: addEventListener, configurable: true },
+        removeEventListener: { value: removeEventListener, configurable: true },
+        dispatchEvent: { value: wrapDispatchEvent(this), configurable: true },
+        __events__: { value: {}, configurable: true }
+      });
     };
     SimpleEventModel.prototype = Constructor.prototype;
     return SimpleEventModel;
@@ -137,11 +148,12 @@ var XCeptor = (function() { // eslint-disable-line no-unused-vars
     // Init prop slots
     void function() {
       for (var i = 0, key; (key = propKeys[i]); i++) {
-        Object.defineProperty(xceptor, propPrefix + key, { configurable: true, writable: true });
+        Object.defineProperty(xceptor, propPrefix + key, {
+          configurable: true, writable: true, value: xhr[key]
+        });
       }
     }();
     // Update default values
-    updateKeys(xhr, xceptor);
     var request = {
       method: null,
       url: null,
@@ -206,6 +218,7 @@ var XCeptor = (function() { // eslint-disable-line no-unused-vars
       for (var i = 0; i < events.length; i++) buildEvent(events[i]);
     }();
   };
+  HijackedXHR.prototype = Object.create(OriginalXMLHttpRequest.prototype);
 
   // Methods mapping
   HijackedXHR.prototype.open = function(method, url, isAsync, username, password) {
@@ -321,8 +334,11 @@ var XCeptor = (function() { // eslint-disable-line no-unused-vars
   // Copy constant names to constructor and prototype
   var constantNames = [ 'UNSENT', 'OPENED', 'HEADERS_RECEIVED', 'LOADING', 'DONE' ];
   for (var i = 0; i < constantNames.length; i++) {
-    HijackedXHR[constantNames[i]] = OriginalXMLHttpRequest[constantNames[i]];
-    HijackedXHR.prototype[constantNames[i]] = OriginalXMLHttpRequest[constantNames[i]];
+    Object.defineProperty(HijackedXHR, constantNames[i], {
+      value: OriginalXMLHttpRequest[constantNames[i]],
+      enumerable: true,
+      configurable: true
+    });
   }
 
   // Exports

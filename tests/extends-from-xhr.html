@@ -1,0 +1,13 @@
+<script src="//cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="/tester.js"></script>
+<script>
+window.OriginalXHR = XMLHttpRequest;
+</script>
+<script src="/xceptor.js"></script>
+<script>
+Tester.assert(window.OriginalXHR !== XMLHttpRequest);
+let xhr = new XMLHttpRequest();
+Tester.assert(xhr instanceof XMLHttpRequest);
+Tester.assert(xhr instanceof window.OriginalXHR);
+Tester.feedback(true);
+</script>
